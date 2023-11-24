@@ -7,16 +7,27 @@ from ..web_app.layouts import ContentBlockIdentifier, LayoutIdentifiers
 
 def register_callbacks():
     @dash.callback(
-        output=[
-            dash.Output(LayoutIdentifiers.GENERATED_CONCEPTS.name, "options"),
-            dash.Output(LayoutIdentifiers.GENERATED_CONCEPTS.name, "value"),
-            dash.Output(LayoutIdentifiers.CONTENT_CONTAINER.name, "active_item"),
-            dash.Output(LayoutIdentifiers.GENERATE_CONCEPTS_LOADING.name, "children"),
-        ],
+        output=dict(
+            new_concept_options=dash.Output(
+                LayoutIdentifiers.GENERATED_CONCEPTS.name, "options"
+            ),
+            new_concepts=dash.Output(
+                LayoutIdentifiers.GENERATED_CONCEPTS.name, "value"
+            ),
+            next_block=dash.Output(
+                LayoutIdentifiers.CONTENT_CONTAINER.name, "active_item"
+            ),
+            loading_item=dash.Output(
+                LayoutIdentifiers.GENERATE_CONCEPTS_LOADING.name, "children"
+            ),
+        ),
         inputs=dict(
             n_click=dash.Input(LayoutIdentifiers.GENERATE_CONCEPTS.name, "n_clicks"),
             language=dash.State(LayoutIdentifiers.LANGUAGE.name, "value"),
             prompt=dash.State(LayoutIdentifiers.PROMPT.name, "value"),
+            already_generated_concepts=dash.State(
+                LayoutIdentifiers.GENERATED_CONCEPTS.name, "options"
+            ),
         ),
         running=[
             (
@@ -28,26 +39,39 @@ def register_callbacks():
         prevent_initial_call=True,
         background=True,
     )
-    def on_generate_concepts(n_click, language, prompt):
+    def on_generate_concepts(n_click, language, prompt, already_generated_concepts):
         time.sleep(2)
-        concepts = [f"concept{i}" for i in range(15)]  # TODO: generate concepts
-        return concepts, concepts, ContentBlockIdentifier.CONCEPTS.name, ""
+        new_concepts = [f"concept{i}" for i in range(15)]  # TODO: generate concepts
+        new_concepts = sorted(
+            [c for c in new_concepts if c not in already_generated_concepts]
+        )
+        new_concept_options = sorted(already_generated_concepts + new_concepts)
+        return dict(
+            new_concept_options=new_concept_options,
+            new_concepts=new_concepts,
+            next_block=ContentBlockIdentifier.CONCEPTS.name,
+            loading_item="",
+        )
 
     @dash.callback(
-        output=[
-            dash.Output(LayoutIdentifiers.GENERATED_FLASHCARDS.name, "children"),
-            dash.Output(
+        output=dict(
+            new_flashcards=dash.Output(
+                LayoutIdentifiers.GENERATED_FLASHCARDS.name, "children"
+            ),
+            next_block=dash.Output(
                 LayoutIdentifiers.CONTENT_CONTAINER.name,
                 "active_item",
                 allow_duplicate=True,
             ),
-            dash.Output(LayoutIdentifiers.GENERATE_FLASHCARDS_LOADING.name, "children"),
-        ],
+            loading_item=dash.Output(
+                LayoutIdentifiers.GENERATE_FLASHCARDS_LOADING.name, "children"
+            ),
+        ),
         inputs=dict(
             n_click=dash.Input(LayoutIdentifiers.GENERATE_FLASHCARDS.name, "n_clicks"),
             language=dash.State(LayoutIdentifiers.LANGUAGE.name, "value"),
             prompt=dash.State(LayoutIdentifiers.PROMPT.name, "value"),
-            concepts=dash.State(LayoutIdentifiers.GENERATED_CONCEPTS.name, "value"),
+            new_concepts=dash.State(LayoutIdentifiers.GENERATED_CONCEPTS.name, "value"),
         ),
         running=[
             (
@@ -59,7 +83,11 @@ def register_callbacks():
         prevent_initial_call=True,
         background=True,
     )
-    def on_generate_flashcards(n_click, language, prompt, concepts):
+    def on_generate_flashcards(n_click, language, prompt, new_concepts):
         time.sleep(2)
         flashcards = [f"flashcard{i}" for i in range(15)]  # TODO: generate flashcards
-        return flashcards, ContentBlockIdentifier.FLASHCARDS.name, ""
+        return dict(
+            new_flashcards=flashcards,
+            next_block=ContentBlockIdentifier.FLASHCARDS.name,
+            loading_item="",
+        )
