@@ -4,164 +4,144 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html
 
 
-class PageIdentifiers(Enum):
+class Language(Enum):
+    ENGLISH = "English"
+    FRENCH = "French"
+    GERMAN = "German"
+
+
+class ContentIdentifiers(Enum):
     HOME = "Home"
     CONCEPTS = "Concepts"
     FLASHCARDS = "Flashcards"
-    NOT_FOUND = "404: Not found"
 
 
 class LayoutIdentifiers(Enum):
+    CONTAINER = "CONTAINER"
     LANGUAGE = "LANGUAGE"
     PROMPT = "PROMPT"
     GENERATE_CONCEPTS = "GENERATE_CONCEPTS"
+    GENERATE_CONCEPTS_LOADING = "GENERATE_CONCEPTS_LOADING"
     GENERATED_CONCEPTS = "GENERATED_CONCEPTS"
     GENERATE_FLASHCARDS = "GENERATE_FLASHCARDS"
+    GENERATE_FLASHCARDS_LOADING = "GENERATE_FLASHCARDS_LOADING"
+    GENERATED_FLASHCARDS = "GENERATED_FLASHCARDS"
 
 
-def get_404_page():
-    return html.Div(
+def get_home_block():
+    return dbc.Form(
         [
-            html.H1(PageIdentifiers.NOT_FOUND.value, className="text-danger"),
-            html.Hr(),
-            html.P("The pathname was not recognised..."),
-        ],
-        className="p-3 bg-light rounded-3",
-        id=PageIdentifiers.NOT_FOUND.name,
-        style={"display": "none"},
-    )
-
-
-def get_home_page():
-    return html.Div(
-        [
-            html.H3("Generate concepts"),
-            dbc.Card(
+            dbc.Row(
                 [
-                    html.Div(
-                        [
-                            dbc.Label("Select language"),
-                            dcc.Dropdown(
-                                id=LayoutIdentifiers.LANGUAGE.name,
-                                options=["French", "English", "German"],
-                                value="English",
-                            ),
-                        ]
+                    dbc.Label(
+                        "Language", html_for=LayoutIdentifiers.LANGUAGE.name, width=2
                     ),
-                    html.Div(
-                        [
-                            dbc.Label("Prompt"),
-                            dcc.Textarea(
-                                value="",
-                                id=LayoutIdentifiers.PROMPT.name,
-                                style={"width": "100%"},
-                            ),
-                        ]
-                    ),
-                    html.Div(
-                        [
-                            html.Button(
-                                id=LayoutIdentifiers.GENERATE_CONCEPTS.name,
-                                n_clicks=0,
-                                children="Generate concepts",
-                            )
-                        ]
+                    dbc.Col(
+                        dcc.Dropdown(
+                            id=LayoutIdentifiers.LANGUAGE.name,
+                            options=[lang.value for lang in Language],
+                            value=Language.ENGLISH.value,
+                        )
                     ),
                 ],
-                body=True,
+                className="mb-3",
             ),
-        ],
-        id=PageIdentifiers.HOME.name,
-        style={"display": "none"},
-    )
-
-
-def get_concepts_page():
-    return html.Div(
-        [
-            html.H3("Generated concepts"),
-            dbc.Card(
+            dbc.Row(
                 [
-                    html.Div(
-                        [
-                            dbc.Label("Generated concepts"),
-                            dcc.Dropdown(
-                                [],
-                                [],
-                                multi=True,
-                                id=LayoutIdentifiers.GENERATED_CONCEPTS.name,
-                            ),
-                        ]
+                    dbc.Label(
+                        "Prompt", html_for=LayoutIdentifiers.PROMPT.name, width=2
                     ),
-                    html.Div(
-                        [
-                            html.Button(
-                                id=LayoutIdentifiers.GENERATE_FLASHCARDS.name,
-                                n_clicks=0,
-                                children="Generate flashcards",
-                            )
-                        ]
+                    dbc.Col(
+                        dbc.FormFloating(
+                            [
+                                dbc.Textarea(id=LayoutIdentifiers.PROMPT.name),
+                                dbc.Label("Concepts description (optional)"),
+                            ]
+                        )
                     ),
                 ],
-                body=True,
+                className="mb-3",
             ),
-        ],
-        id=PageIdentifiers.CONCEPTS.name,
-        style={"display": "none"},
+            dbc.Button(
+                "Generate concepts",
+                id=LayoutIdentifiers.GENERATE_CONCEPTS.name,
+                color="primary",
+            ),
+            dcc.Loading(
+                type="default",
+                children=html.Div(id=LayoutIdentifiers.GENERATE_CONCEPTS_LOADING.name),
+            ),
+        ]
     )
 
 
-def get_flashcards_page():
-    return html.Div(
+def get_concepts_block():
+    return dbc.Form(
         [
-            html.H3("Generated flashcards"),
+            dbc.Row(
+                [
+                    dbc.Label(
+                        "Generated concepts",
+                        html_for=LayoutIdentifiers.GENERATED_CONCEPTS.name,
+                        width=2,
+                    ),
+                    dbc.Col(
+                        dcc.Dropdown(
+                            [],
+                            [],
+                            multi=True,
+                            id=LayoutIdentifiers.GENERATED_CONCEPTS.name,
+                        ),
+                    ),
+                ],
+                className="mb-3",
+            ),
+            dbc.Button(
+                "Generate flashcards",
+                id=LayoutIdentifiers.GENERATE_FLASHCARDS.name,
+                color="primary",
+            ),
+            dcc.Loading(
+                type="default",
+                children=html.Div(
+                    id=LayoutIdentifiers.GENERATE_FLASHCARDS_LOADING.name
+                ),
+            ),
         ],
-        id=PageIdentifiers.FLASHCARDS.name,
-        style={"display": "none"},
+    )
+
+
+def get_flashcards_block():
+    return html.Div(
+        [],
     )
 
 
 def get_app_layout():
-    sidebar = html.Div(
+    return dbc.Container(
         [
-            html.H2("Flashcard Generator", className="display-4"),
+            html.H1("Vocabulary Flashcard Generator"),
             html.Hr(),
-            dbc.Nav(
+            dbc.Accordion(
                 [
-                    dbc.NavLink(
-                        p.value,
-                        href="/" if p == PageIdentifiers.HOME else f"/{p.name.lower()}",
-                        active="exact",
-                    )
-                    for p in PageIdentifiers
-                    if p != PageIdentifiers.NOT_FOUND
+                    dbc.AccordionItem(
+                        get_home_block(),
+                        title="Concept generation",
+                        item_id=ContentIdentifiers.HOME.name,
+                    ),
+                    dbc.AccordionItem(
+                        get_concepts_block(),
+                        title="Flashcard generation",
+                        item_id=ContentIdentifiers.CONCEPTS.name,
+                    ),
+                    dbc.AccordionItem(
+                        get_flashcards_block(),
+                        title="Generated flashcards",
+                        item_id=ContentIdentifiers.FLASHCARDS.name,
+                    ),
                 ],
-                vertical=True,
-                pills=True,
+                id=LayoutIdentifiers.CONTAINER.name,
+                active_item=ContentIdentifiers.HOME.name,
             ),
-        ],
-        style={
-            "position": "fixed",
-            "top": 0,
-            "left": 0,
-            "bottom": 0,
-            "width": "18rem",
-            "padding": "2rem 1rem",
-            "background-color": "#f8f9fa",
-        },
+        ]
     )
-    content = html.Div(
-        [
-            get_home_page(),
-            get_concepts_page(),
-            get_flashcards_page(),
-            get_404_page(),
-        ],
-        id="page-content",
-        style={
-            "margin-left": "18rem",
-            "margin-right": "2rem",
-            "padding": "2rem 1rem",
-        },
-    )
-    return html.Div([dcc.Location(id="url", refresh="callback-nav"), sidebar, content])
