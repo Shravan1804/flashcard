@@ -10,14 +10,14 @@ class Language(Enum):
     GERMAN = "German"
 
 
-class ContentIdentifiers(Enum):
+class ContentBlockIdentifier(Enum):
     HOME = "Home"
     CONCEPTS = "Concepts"
     FLASHCARDS = "Flashcards"
 
 
 class LayoutIdentifiers(Enum):
-    CONTAINER = "CONTAINER"
+    CONTENT_CONTAINER = "CONTENT_CONTAINER"
     LANGUAGE = "LANGUAGE"
     PROMPT = "PROMPT"
     GENERATE_CONCEPTS = "GENERATE_CONCEPTS"
@@ -114,6 +114,7 @@ def get_concepts_block():
 def get_flashcards_block():
     return html.Div(
         [],
+        id=LayoutIdentifiers.GENERATED_FLASHCARDS.name,
     )
 
 
@@ -127,21 +128,21 @@ def get_app_layout():
                     dbc.AccordionItem(
                         get_home_block(),
                         title="Concept generation",
-                        item_id=ContentIdentifiers.HOME.name,
+                        item_id=ContentBlockIdentifier.HOME.name,
                     ),
                     dbc.AccordionItem(
                         get_concepts_block(),
                         title="Flashcard generation",
-                        item_id=ContentIdentifiers.CONCEPTS.name,
+                        item_id=ContentBlockIdentifier.CONCEPTS.name,
                     ),
                     dbc.AccordionItem(
                         get_flashcards_block(),
                         title="Generated flashcards",
-                        item_id=ContentIdentifiers.FLASHCARDS.name,
+                        item_id=ContentBlockIdentifier.FLASHCARDS.name,
                     ),
                 ],
-                id=LayoutIdentifiers.CONTAINER.name,
-                active_item=ContentIdentifiers.HOME.name,
+                id=LayoutIdentifiers.CONTENT_CONTAINER.name,
+                active_item=ContentBlockIdentifier.HOME.name,
             ),
         ]
     )
