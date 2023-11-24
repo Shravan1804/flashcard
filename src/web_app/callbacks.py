@@ -1,35 +1,34 @@
-from dash import Input, Output, State, callback
+import time
 
-from ..web_app.layouts import LayoutIdentifiers, PageIdentifiers
+import dash
+
+from ..web_app.layouts import ContentIdentifiers, LayoutIdentifiers
 
 
 def register_callbacks():
-    @callback(
-        output={p.name: Output(p.name, "style") for p in PageIdentifiers},
-        inputs={"pathname": Input("url", "pathname")},
-    )
-    def render_page_content(pathname):
-        ret = {p.name: {"display": "none"} for p in PageIdentifiers}
-        for p in PageIdentifiers:
-            if pathname == "/":
-                ret[PageIdentifiers.HOME.name] = {"display": "block"}
-            elif pathname == f"/{p.name.lower()}":
-                ret[p.name] = {"display": "block"}
-        return ret
-
-    @callback(
+    @dash.callback(
         output=[
-            Output(LayoutIdentifiers.GENERATED_CONCEPTS.name, "options"),
-            Output(LayoutIdentifiers.GENERATED_CONCEPTS.name, "value"),
-            Output("url", "pathname"),
+            dash.Output(LayoutIdentifiers.GENERATED_CONCEPTS.name, "options"),
+            dash.Output(LayoutIdentifiers.GENERATED_CONCEPTS.name, "value"),
+            dash.Output(LayoutIdentifiers.CONTAINER.name, "active_item"),
+            dash.Output(LayoutIdentifiers.GENERATE_CONCEPTS_LOADING.name, "children"),
         ],
         inputs=dict(
-            n_clicks=Input(LayoutIdentifiers.GENERATE_CONCEPTS.name, "n_clicks"),
-            language=State(LayoutIdentifiers.LANGUAGE.name, "value"),
-            prompt=State(LayoutIdentifiers.PROMPT.name, "value"),
+            n_click=dash.Input(LayoutIdentifiers.GENERATE_CONCEPTS.name, "n_clicks"),
+            language=dash.State(LayoutIdentifiers.LANGUAGE.name, "value"),
+            prompt=dash.State(LayoutIdentifiers.PROMPT.name, "value"),
         ),
+        running=[
+            (
+                dash.Output(LayoutIdentifiers.GENERATE_CONCEPTS.name, "disabled"),
+                True,
+                False,
+            ),
+        ],
         prevent_initial_call=True,
+        background=True,
     )
-    def render_concepts(n_clicks, language, prompt):
-        concepts = ["concept1", "concept2", "concept3"]  # TODO: generate concepts
-        return concepts, concepts, f"/{PageIdentifiers.CONCEPTS.name.lower()}"
+    def on_generate_concepts(n_click, language, prompt):
+        time.sleep(2)
+        concepts = [f"concept{i}" for i in range(15)]  # TODO: generate concepts
+        return concepts, concepts, ContentIdentifiers.CONCEPTS.name, ""
