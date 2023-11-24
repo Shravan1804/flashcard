@@ -121,7 +121,7 @@ def get_flashcards_page():
     )
 
 
-def get_layout():
+def get_app_layout():
     sidebar = html.Div(
         [
             html.H2("Flashcard Generator", className="display-4"),
