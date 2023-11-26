@@ -112,16 +112,16 @@ def get_concepts_block():
 
 
 def get_flashcards_block():
-    return dbc.CardGroup(
+    return html.Div(
         [],
         id=LayoutIdentifiers.GENERATED_FLASHCARDS.name,
     )
 
 
-def get_flashcard(concept):
+def create_flashcard_from_concept(concept):
     return dbc.Card(
         [
-            dbc.CardImg(src="/assets/placeholder286x180.png", top=True),
+            dbc.CardImg(src="assets/placeholder286x180.png", top=True),
             dbc.CardBody(
                 [
                     html.H4(concept, className="card-title"),
@@ -137,6 +137,17 @@ def get_flashcard(concept):
             ),
         ],
     )
+
+
+def get_flashcards_layout(concepts, ncols=5):
+    flashcards = [create_flashcard_from_concept(concept) for concept in concepts]
+    return [
+        dbc.Row(
+            [dbc.Col(fc) for fc in flashcards[i : i + ncols]],
+            className="mb-4",
+        )
+        for i in range(0, len(flashcards), ncols)
+    ]
 
 
 def get_app_layout():

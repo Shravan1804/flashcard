@@ -2,7 +2,11 @@ import time
 
 import dash
 
-from ..web_app.layouts import ContentBlockIdentifier, LayoutIdentifiers, get_flashcard
+from ..web_app.layouts import (
+    ContentBlockIdentifier,
+    LayoutIdentifiers,
+    get_flashcards_layout,
+)
 
 
 def register_callbacks():
@@ -41,7 +45,7 @@ def register_callbacks():
     )
     def on_generate_concepts(n_click, language, prompt, already_generated_concepts):
         time.sleep(2)
-        new_concepts = [f"concept{i}" for i in range(15)]  # TODO: generate concepts
+        new_concepts = [f"concept{i:03}" for i in range(15)]  # TODO: generate concepts
         new_concepts = sorted(
             [c for c in new_concepts if c not in already_generated_concepts]
         )
@@ -85,12 +89,11 @@ def register_callbacks():
     )
     def on_generate_flashcards(n_click, language, prompt, new_concepts):
         time.sleep(2)
-        new_flashcards = [
-            f"flashcard{i}" for i in range(15)
-        ]  # TODO: generate flashcards
-        new_flashcards = [get_flashcard(f) for f in new_flashcards]
+        # TODO: generate flashcards
+        new_flashcard_rows = get_flashcards_layout(new_concepts)
         patched_flashcards = dash.Patch()
-        patched_flashcards.extend(new_flashcards)
+        for new_flashcard_row in reversed(new_flashcard_rows):
+            patched_flashcards.prepend(new_flashcard_row)
         return dict(
             patched_flashcards=patched_flashcards,
             next_block=ContentBlockIdentifier.FLASHCARDS.name,

@@ -11,6 +11,7 @@ if __name__ == "__main__":
         __name__,
         external_stylesheets=[dbc.themes.BOOTSTRAP],
         background_callback_manager=DiskcacheManager(cache),
+        assets_folder="../assets",
     )
     app.layout = get_app_layout()
     register_callbacks()
