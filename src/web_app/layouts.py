@@ -1,13 +1,8 @@
 from enum import Enum
 
 import dash_bootstrap_components as dbc
+from babelnet.language import Language
 from dash import dcc, html
-
-
-class Language(Enum):
-    ENGLISH = "English"
-    FRENCH = "French"
-    GERMAN = "German"
 
 
 class ContentBlockIdentifier(Enum):
@@ -18,7 +13,7 @@ class ContentBlockIdentifier(Enum):
 
 class LayoutIdentifiers(Enum):
     CONTENT_CONTAINER = "CONTENT_CONTAINER"
-    LANGUAGE = "LANGUAGE"
+    LANG = "LANG"
     DESCRIPTION = "DESCRIPTION"
     GENERATE_CONCEPTS = "GENERATE_CONCEPTS"
     GENERATE_CONCEPTS_LOADING = "GENERATE_CONCEPTS_LOADING"
@@ -34,13 +29,17 @@ def get_home_block():
             dbc.Row(
                 [
                     dbc.Label(
-                        "Language", html_for=LayoutIdentifiers.LANGUAGE.name, width=2
+                        "Language", html_for=LayoutIdentifiers.LANG.name, width=2
                     ),
                     dbc.Col(
                         dcc.Dropdown(
-                            id=LayoutIdentifiers.LANGUAGE.name,
-                            options=[lang.value for lang in Language],
-                            value=Language.ENGLISH.value,
+                            id=LayoutIdentifiers.LANG.name,
+                            options=[
+                                Language.EN.value,
+                                Language.FR.value,
+                                Language.DE.value,
+                            ],
+                            value=Language.EN.value,
                         )
                     ),
                 ],
@@ -120,19 +119,21 @@ def get_flashcards_block():
     )
 
 
-def create_flashcard_from_concept(concept):
+def create_flashcard_from_concept(flashcard_data):
+    concept, definition, example, image = flashcard_data
+    image = image if image else "assets/placeholder286x180.png"
     return dbc.Card(
         [
-            dbc.CardImg(src="assets/placeholder286x180.png", top=True),
+            dbc.CardImg(src=image, top=True),
             dbc.CardBody(
                 [
                     html.H4(concept, className="card-title"),
                     html.P(
-                        "Definition",
+                        definition,
                         className="card-text",
                     ),
                     html.P(
-                        "Examples",
+                        example,
                         className="card-text",
                     ),
                 ]
@@ -141,8 +142,11 @@ def create_flashcard_from_concept(concept):
     )
 
 
-def get_flashcards_layout(concepts, ncols=5):
-    flashcards = [create_flashcard_from_concept(concept) for concept in concepts]
+def get_flashcards_layout(flashcards_data, ncols=5):
+    flashcards = [
+        create_flashcard_from_concept(flashcard_data)
+        for flashcard_data in flashcards_data
+    ]
     return [
         dbc.Row(
             [dbc.Col(fc) for fc in flashcards[i : i + ncols]],

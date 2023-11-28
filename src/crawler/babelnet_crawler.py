@@ -22,7 +22,7 @@ class BabelNetCrawler:
         return self.clean_synsets(synsets)
 
     def extract_flashcard_info(self, synset):
-        definitions = synset.glosses
+        definitions = synset.glosses()
         examples = synset.examples()
         definition = definitions[0].gloss if definitions else None
         example = examples[0].example if examples else None
@@ -31,8 +31,12 @@ class BabelNetCrawler:
 
     def select_flashcard_info(self, flashcard_info_lst):
         for flashcard_info in flashcard_info_lst:
-            if flashcard_info[0] and flashcard_info[1] and flashcard_info[2]:
+            definition, example, image = flashcard_info
+            if definition and example and image:
                 return flashcard_info
+        flashcard_info_lst = sorted(
+            flashcard_info_lst, key=lambda x: -sum(i is not None for i in x)
+        )
         return flashcard_info_lst[0]
 
     def generate_flashcard(self, concept, language):

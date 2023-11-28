@@ -1,6 +1,5 @@
-import time
-
 import dash
+from babelnet import Language
 
 from ..generator.concept_generator import LLM
 from ..web_app.layouts import (
@@ -10,7 +9,7 @@ from ..web_app.layouts import (
 )
 
 
-def register_callbacks(concept_generator):
+def register_callbacks(concept_generator, babelnet_crawler):
     @dash.callback(
         output=dict(
             new_concept_options=dash.Output(
@@ -28,7 +27,7 @@ def register_callbacks(concept_generator):
         ),
         inputs=dict(
             n_click=dash.Input(LayoutIdentifiers.GENERATE_CONCEPTS.name, "n_clicks"),
-            language=dash.State(LayoutIdentifiers.LANGUAGE.name, "value"),
+            language=dash.State(LayoutIdentifiers.LANG.name, "value"),
             description=dash.State(LayoutIdentifiers.DESCRIPTION.name, "value"),
             already_generated_concepts=dash.State(
                 LayoutIdentifiers.GENERATED_CONCEPTS.name, "options"
@@ -77,7 +76,7 @@ def register_callbacks(concept_generator):
         ),
         inputs=dict(
             n_click=dash.Input(LayoutIdentifiers.GENERATE_FLASHCARDS.name, "n_clicks"),
-            language=dash.State(LayoutIdentifiers.LANGUAGE.name, "value"),
+            language=dash.State(LayoutIdentifiers.LANG.name, "value"),
             prompt=dash.State(LayoutIdentifiers.DESCRIPTION.name, "value"),
             new_concepts=dash.State(LayoutIdentifiers.GENERATED_CONCEPTS.name, "value"),
         ),
@@ -92,9 +91,13 @@ def register_callbacks(concept_generator):
         background=True,
     )
     def on_generate_flashcards(n_click, language, prompt, new_concepts):
-        time.sleep(2)
-        # TODO: generate flashcards
-        new_flashcard_rows = get_flashcards_layout(new_concepts)
+        language = Language(language)
+        new_flashcards = [
+            babelnet_crawler.generate_flashcard(concept, language)
+            for concept in new_concepts
+        ]
+        new_flashcards = [f for f in new_flashcards if f is not None]
+        new_flashcard_rows = get_flashcards_layout(new_flashcards)
         patched_flashcards = dash.Patch()
         for new_flashcard_row in reversed(new_flashcard_rows):
             patched_flashcards.prepend(new_flashcard_row)
