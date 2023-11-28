@@ -6,3 +6,4 @@ dash[diskcache]==2.14.1
 dash-bootstrap-components==1.5.0
 python-dotenv==1.0.0
 openai==1.3.5
+babelnet==1.1.0
