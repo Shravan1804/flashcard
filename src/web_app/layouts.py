@@ -34,11 +34,23 @@ def get_home_block():
                     dbc.Col(
                         dcc.Dropdown(
                             id=LayoutIdentifiers.LANG.name,
-                            options=[
-                                Language.EN.value,
-                                Language.FR.value,
-                                Language.DE.value,
-                            ],
+                            options=sorted(
+                                [
+                                    Language(lang).value
+                                    for lang in [
+                                        "English",
+                                        "Spanish",
+                                        "French",
+                                        "German",
+                                        "Italian",
+                                        "Portuguese",
+                                        "Dutch",
+                                        "Russian",
+                                        "Chinese",
+                                        "Korean",
+                                    ]
+                                ]
+                            ),
                             value=Language.EN.value,
                         )
                     ),
