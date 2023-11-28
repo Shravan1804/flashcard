@@ -19,7 +19,7 @@ class ContentBlockIdentifier(Enum):
 class LayoutIdentifiers(Enum):
     CONTENT_CONTAINER = "CONTENT_CONTAINER"
     LANGUAGE = "LANGUAGE"
-    PROMPT = "PROMPT"
+    DESCRIPTION = "DESCRIPTION"
     GENERATE_CONCEPTS = "GENERATE_CONCEPTS"
     GENERATE_CONCEPTS_LOADING = "GENERATE_CONCEPTS_LOADING"
     GENERATED_CONCEPTS = "GENERATED_CONCEPTS"
@@ -49,12 +49,14 @@ def get_home_block():
             dbc.Row(
                 [
                     dbc.Label(
-                        "Prompt", html_for=LayoutIdentifiers.PROMPT.name, width=2
+                        "Description",
+                        html_for=LayoutIdentifiers.DESCRIPTION.name,
+                        width=2,
                     ),
                     dbc.Col(
                         dbc.FormFloating(
                             [
-                                dbc.Textarea(id=LayoutIdentifiers.PROMPT.name),
+                                dbc.Textarea(id=LayoutIdentifiers.DESCRIPTION.name),
                                 dbc.Label("Concepts description (optional)"),
                             ]
                         )

@@ -2,6 +2,7 @@ import time
 
 import dash
 
+from ..generator.concept_generator import LLM
 from ..web_app.layouts import (
     ContentBlockIdentifier,
     LayoutIdentifiers,
@@ -9,7 +10,7 @@ from ..web_app.layouts import (
 )
 
 
-def register_callbacks():
+def register_callbacks(concept_generator):
     @dash.callback(
         output=dict(
             new_concept_options=dash.Output(
@@ -28,7 +29,7 @@ def register_callbacks():
         inputs=dict(
             n_click=dash.Input(LayoutIdentifiers.GENERATE_CONCEPTS.name, "n_clicks"),
             language=dash.State(LayoutIdentifiers.LANGUAGE.name, "value"),
-            prompt=dash.State(LayoutIdentifiers.PROMPT.name, "value"),
+            description=dash.State(LayoutIdentifiers.DESCRIPTION.name, "value"),
             already_generated_concepts=dash.State(
                 LayoutIdentifiers.GENERATED_CONCEPTS.name, "options"
             ),
@@ -43,9 +44,12 @@ def register_callbacks():
         prevent_initial_call=True,
         background=True,
     )
-    def on_generate_concepts(n_click, language, prompt, already_generated_concepts):
-        time.sleep(2)
-        new_concepts = [f"concept{i:03}" for i in range(15)]  # TODO: generate concepts
+    def on_generate_concepts(
+        n_click, language, description, already_generated_concepts
+    ):
+        new_concepts = concept_generator.generate_concepts(
+            LLM.OPENAI, language, description, already_generated_concepts
+        )
         new_concepts = sorted(
             [c for c in new_concepts if c not in already_generated_concepts]
         )
@@ -74,7 +78,7 @@ def register_callbacks():
         inputs=dict(
             n_click=dash.Input(LayoutIdentifiers.GENERATE_FLASHCARDS.name, "n_clicks"),
             language=dash.State(LayoutIdentifiers.LANGUAGE.name, "value"),
-            prompt=dash.State(LayoutIdentifiers.PROMPT.name, "value"),
+            prompt=dash.State(LayoutIdentifiers.DESCRIPTION.name, "value"),
             new_concepts=dash.State(LayoutIdentifiers.GENERATED_CONCEPTS.name, "value"),
         ),
         running=[
