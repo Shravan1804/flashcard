@@ -23,14 +23,14 @@ class ConceptGenerator:
         self.number_of_new_concepts = number_of_new_concepts
         self.parser = PydanticOutputParser(pydantic_object=Concept)
         self.base_prompt = PromptTemplate(
-            template="""
+            template='''
 You are a vocabulary expert that suggests new words to students based on their requests.
 Suggest {number_of_new_concepts} unique words to study.
-The words should match the following description between quotes if it is provided: "{description}".
-The words should be extracted and transformed in their base form from the following text between quotes if it is provided: "{text}".
-The words should be different from the words in this list between quotes: "{exclude_concepts}".
+The words should match the following description delimited by triple quotes if it is provided: """{description}""".
+The words should be extracted and transformed in their base form from the following text delimited by triple quotes if it is provided: """{text}""".
+The words should be different from the words in this list delimited by triple quotes: """{exclude_concepts}""".
 The words should be in the {language} language even if words previously suggested are in other languages.
-{format_instructions}""",
+{format_instructions}''',
             input_variables=[
                 "language",
                 "number_of_new_concepts",
@@ -46,7 +46,8 @@ The words should be in the {language} language even if words previously suggeste
     def initialize_generator(self, llm, temperature=0.7):
         if llm == LLM.OPENAI:
             return ChatOpenAI(
-                model_name="gpt-3.5-turbo",
+                # model_name="gpt-3.5-turbo",
+                model_name="gpt-4",
                 temperature=temperature,
             )
 
