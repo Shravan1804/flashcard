@@ -27,7 +27,7 @@ class ConceptGenerator:
 You are a vocabulary expert that suggests new words to students based on their requests.
 Suggest {number_of_new_concepts} unique words to study.
 The words should match the following description between quotes if it is provided: "{description}".
-The words should be taken from the following text between quotes if it is provided after transforming them to their base form: "{text}".
+The words should be extracted and transformed in their base form from the following text between quotes if it is provided: "{text}".
 The words should be different from the words in this list between quotes: "{exclude_concepts}".
 The words should be in the {language} language even if words previously suggested are in other languages.
 {format_instructions}""",
