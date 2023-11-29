@@ -15,6 +15,7 @@ class LayoutIdentifiers(Enum):
     CONTENT_CONTAINER = "CONTENT_CONTAINER"
     LANG = "LANG"
     DESCRIPTION = "DESCRIPTION"
+    TEXT = "TEXT"
     GENERATE_CONCEPTS = "GENERATE_CONCEPTS"
     GENERATE_CONCEPTS_LOADING = "GENERATE_CONCEPTS_LOADING"
     GENERATED_CONCEPTS = "GENERATED_CONCEPTS"
@@ -69,6 +70,24 @@ def get_home_block():
                             [
                                 dbc.Textarea(id=LayoutIdentifiers.DESCRIPTION.name),
                                 dbc.Label("Concepts description (optional)"),
+                            ]
+                        )
+                    ),
+                ],
+                className="mb-3",
+            ),
+            dbc.Row(
+                [
+                    dbc.Label(
+                        "Text",
+                        html_for=LayoutIdentifiers.TEXT.name,
+                        width=2,
+                    ),
+                    dbc.Col(
+                        dbc.FormFloating(
+                            [
+                                dbc.Textarea(id=LayoutIdentifiers.TEXT.name),
+                                dbc.Label("Text to extract concepts from (optional)"),
                             ]
                         )
                     ),

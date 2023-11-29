@@ -24,15 +24,18 @@ class ConceptGenerator:
         self.parser = PydanticOutputParser(pydantic_object=Concept)
         self.base_prompt = PromptTemplate(
             template="""
-You are a vocabulary expert that suggests simple new words to students based on their requests.
-Suggest {number_of_new_concepts} unique simple new words to study that satisfy the following description: {description}.
-The words should be different from the words in this list: {exclude_concepts}.
+You are a vocabulary expert that suggests new words to students based on their requests.
+Suggest {number_of_new_concepts} unique words to study.
+The words should match the following description between quotes if it is provided: "{description}".
+The words should be taken from the following text between quotes if it is provided after transforming them to their base form: "{text}".
+The words should be different from the words in this list between quotes: "{exclude_concepts}".
 The words should be in the {language} language even if words previously suggested are in other languages.
 {format_instructions}""",
             input_variables=[
                 "language",
                 "number_of_new_concepts",
                 "description",
+                "text",
                 "exclude_concepts",
             ],
             partial_variables={
@@ -47,11 +50,12 @@ The words should be in the {language} language even if words previously suggeste
                 temperature=temperature,
             )
 
-    def generate_concepts(self, llm, language, description, exclude_concepts):
+    def generate_concepts(self, llm, language, description, text, exclude_concepts):
         prompt_kwargs = dict(
             language=language,
             number_of_new_concepts=self.number_of_new_concepts,
             description=description,
+            text=text,
             exclude_concepts=exclude_concepts,
         )
         if llm not in self.generators:

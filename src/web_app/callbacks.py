@@ -29,6 +29,7 @@ def register_callbacks(concept_generator, babelnet_crawler):
             n_click=dash.Input(LayoutIdentifiers.GENERATE_CONCEPTS.name, "n_clicks"),
             language=dash.State(LayoutIdentifiers.LANG.name, "value"),
             description=dash.State(LayoutIdentifiers.DESCRIPTION.name, "value"),
+            text=dash.State(LayoutIdentifiers.TEXT.name, "value"),
             already_generated_concepts=dash.State(
                 LayoutIdentifiers.GENERATED_CONCEPTS.name, "options"
             ),
@@ -44,10 +45,10 @@ def register_callbacks(concept_generator, babelnet_crawler):
         background=True,
     )
     def on_generate_concepts(
-        n_click, language, description, already_generated_concepts
+        n_click, language, description, text, already_generated_concepts
     ):
         new_concepts = concept_generator.generate_concepts(
-            LLM.OPENAI, language, description, already_generated_concepts
+            LLM.OPENAI, language, description, text, already_generated_concepts
         )
         new_concepts = sorted(
             [c for c in new_concepts if c not in already_generated_concepts]
