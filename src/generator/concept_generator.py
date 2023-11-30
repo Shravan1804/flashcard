@@ -26,8 +26,9 @@ class ConceptGenerator:
             template='''
 You are a vocabulary expert that suggests new words to students based on their requests.
 Suggest {number_of_new_concepts} unique words to study.
-The words should match the following description delimited by triple quotes if it is provided: """{description}""".
-The words should be extracted and transformed in their base form from the following text delimited by triple quotes if it is provided: """{text}""".
+The words should be extracted and transformed in their base form from the following text delimited by triple quotes if
+it is provided """{text}""" and should match the following description delimited by triple quotes if it is provided
+"""{description}""".
 The words should be different from the words in this list delimited by triple quotes: """{exclude_concepts}""".
 The words should be in the {language} language even if words previously suggested are in other languages.
 {format_instructions}''',
