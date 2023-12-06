@@ -1,1 +1,1 @@
-# Flashcard project
+# Flashcard generation prototype
